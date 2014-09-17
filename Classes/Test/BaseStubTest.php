@@ -24,8 +24,8 @@
  ***************************************************************/
 
 /**
- * @package Checkout
- * @subpackage Tests
+ * @package ExtbaseFunctionals
+ * @subpackage Test
  */
 abstract class Tx_ExtbaseFunctionals_Test_BaseStubTest extends Tx_Extbase_Tests_Unit_BaseTestCase
 {

@@ -26,8 +26,8 @@
 /**
  * Base class for controller tests.
  *
- * @package Checkout
- * @subpackage Tests
+ * @package ExtbaseFunctionals
+ * @subpackage Test
  */
 abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     extends Tx_ExtbaseFunctionals_Test_BaseStubTest

@@ -24,8 +24,8 @@
  ***************************************************************/
 
 /**
- * @package Checkout
- * @subpackage Tests
+ * @package ExtbaseFunctionals
+ * @subpackage Constraint
  */
 class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework_Constraint
 {

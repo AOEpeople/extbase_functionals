@@ -24,8 +24,8 @@
  ***************************************************************/
 
 /**
- * @package Checkout
- * @subpackage Tests
+ * @package ExtbaseFunctionals
+ * @subpackage DataBuilder
  */
 abstract class Tx_ExtbaseFunctionals_DataBuilder_AbstractBuilder
 {

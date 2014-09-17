@@ -25,7 +25,7 @@
 
 /**
  * @package ExtbaseFunctionals
- * @subpackage Tests
+ * @subpackage Stub
  */
 interface Tx_ExtbaseFunctionals_Stub_StubInterface extends t3lib_Singleton
 {
