@@ -168,4 +168,12 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         );
         self::assertThat($this->controller, $constraint);
     }
+
+    /**
+     */
+    protected function assertNoError()
+    {
+        $constraint = new Tx_ExtbaseFunctionals_Constraint_NoErrorConstraint();
+        self::assertThat($this->controller, $constraint);
+    }
 }
