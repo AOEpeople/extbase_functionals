@@ -56,7 +56,7 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     protected function matches($other)
     {
         if ($other instanceof Tx_Extbase_MVC_Controller_AbstractController) {
-            return $this->hasError($this->getRequest($other)->getErrors(), $this->code, $this->message);
+            return $this->hasError($this->getRequest($other)->getErrors());
         }
         return false;
     }
@@ -69,21 +69,21 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     {
         if (is_array($errors)) {
             foreach ($errors as $error) {
-                if ($this->hasError($error, $this->code, $this->message)) {
+                if ($this->hasError($error)) {
                     return true;
                 }
             }
         }
         if ($errors instanceof Tx_Extbase_Validation_PropertyError) {
-            if ($this->checkError($errors, $this->code, $this->message)) {
+            if ($this->checkError($errors)) {
                 return true;
             }
-            if ($this->hasError($errors->getErrors(), $this->code, $this->message)) {
+            if ($this->hasError($errors->getErrors())) {
                 return true;
             }
         }
         if ($errors instanceof Tx_Extbase_Error_Error) {
-            if ($this->checkError($errors, $this->code, $this->message)) {
+            if ($this->checkError($errors)) {
                 return true;
             }
         }
