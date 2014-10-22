@@ -81,7 +81,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $request->setControllerActionName($action);
         $request->setControllerName($controller);
         $request->setMethod($method);
-        $request->setControllerExtensionName('Checkout');
+        $request->setControllerExtensionName($this->getExtensionName());
         $request->setHmacVerified(true);
 
         foreach ($arguments as $key => $value) {
