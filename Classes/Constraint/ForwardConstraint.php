@@ -103,7 +103,7 @@ class Tx_ExtbaseFunctionals_Constraint_ForwardConstraint extends PHPUnit_Framewo
      */
     protected function failureDescription($other)
     {
-        return ' ' . $this->toString();
+        return PHPUnit_Util_Type::export($this->getRequest($other)) . ' ' . $this->toString();
     }
 
     /**
