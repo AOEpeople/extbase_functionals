@@ -69,6 +69,25 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     }
 
     /**
+     * @param array $settings
+     * @return void
+     */
+    public function emulateSettings(array $settings)
+    {
+        $configuration = $this->getMockBuilder('Tx_Extbase_Configuration_ConfigurationManagerInterface')
+            ->setMethods(array(
+                'setContentObject',
+                'getContentObject',
+                'getConfiguration',
+                'setConfiguration',
+                'isFeatureEnabled',
+            ))
+            ->getMock();
+        $configuration->expects($this->any())->method('getConfiguration')->will($this->returnValue($settings));
+        $this->controller->injectConfigurationManager($configuration);
+    }
+
+    /**
      * @param string $controller
      * @param string $action
      * @param array $arguments
