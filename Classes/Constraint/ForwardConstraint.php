@@ -67,8 +67,12 @@ class Tx_ExtbaseFunctionals_Constraint_ForwardConstraint extends PHPUnit_Framewo
             if (null !== $this->controller && $request->getControllerName() !== $this->controller) {
                 return false;
             }
-            if (count($this->arguments) > 0 && $request->getArguments() !== $this->arguments) {
-                return false;
+            foreach ($this->arguments as $expectedArgumentName => $expectedArgumentValue) {
+                if (false === array_key_exists($expectedArgumentName, $request->getArguments()) ||
+                    false === in_array($expectedArgumentValue, $request->getArguments(), true)
+                ) {
+                    return false;
+                }
             }
             if ($request->getControllerActionName() !== $this->action) {
                 return false;
@@ -99,7 +103,7 @@ class Tx_ExtbaseFunctionals_Constraint_ForwardConstraint extends PHPUnit_Framewo
      */
     protected function failureDescription($other)
     {
-        return PHPUnit_Util_Type::export($this->getRequest($other)) . ' ' . $this->toString();
+        return ' ' . $this->toString();
     }
 
     /**
