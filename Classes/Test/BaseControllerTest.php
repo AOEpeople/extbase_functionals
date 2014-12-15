@@ -36,6 +36,10 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @var Tx_Extbase_MVC_Controller_ActionController
      */
     protected $controller;
+    /**
+     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+     */
+    protected $objectManager;
 
     /**
      * @return string
@@ -57,6 +61,9 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function setUp()
     {
+        if (t3lib_div::compat_version('6.2')) {
+            $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        }
         $bootstrap = new Tx_Extbase_Core_Bootstrap();
         $bootstrap->initialize(
             array(
