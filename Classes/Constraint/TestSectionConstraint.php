@@ -45,6 +45,7 @@ class Tx_ExtbaseFunctionals_Constraint_TestSectionConstraint extends PHPUnit_Fra
     public function __construct($string)
     {
         $this->string = $string;
+        parent::__construct();
     }
 
     /**

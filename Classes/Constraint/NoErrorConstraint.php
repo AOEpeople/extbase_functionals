@@ -59,7 +59,7 @@ class Tx_ExtbaseFunctionals_Constraint_NoErrorConstraint extends PHPUnit_Framewo
      */
     protected function failureDescription($other)
     {
-        return PHPUnit_Util_Type::export($this->getRequest($other)->getErrors()) . ' ' . $this->toString();
+        return $this->exporter->export($this->getRequest($other)->getErrors()) . ' ' . $this->toString();
     }
 
     /**

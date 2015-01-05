@@ -40,6 +40,7 @@ class Tx_ExtbaseFunctionals_Constraint_XPathConstraint extends PHPUnit_Framework
     public function __construct($xPath)
     {
         $this->xPath = $xPath;
+        parent::__construct();
     }
 
     /**

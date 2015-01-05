@@ -47,6 +47,7 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     {
         $this->code = $code;
         $this->message = $message;
+        parent::__construct();
     }
 
     /**
@@ -122,7 +123,7 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
      */
     protected function failureDescription($other)
     {
-        return PHPUnit_Util_Type::export($this->getRequest($other)) . ' ' . $this->toString();
+        return $this->exporter->export($this->getRequest($other)) . ' ' . $this->toString();
     }
 
     /**

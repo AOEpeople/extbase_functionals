@@ -61,6 +61,7 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
         $this->controller = $controller;
         $this->arguments = $arguments;
         $this->statusCode = $statusCode;
+        parent::__construct();
     }
 
     /**
