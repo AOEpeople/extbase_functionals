@@ -57,6 +57,11 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     abstract protected function getExtensionName();
 
     /**
+     * @var \TYPO3\CMS\Extbase\Mvc\Controller\MvcPropertyMappingConfigurationService
+     */
+    protected $mvcPropertyMappingConfigurationService;
+
+    /**
      * set up controller
      */
     public function setUp()
@@ -73,6 +78,9 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         );
         $this->registerStubs();
         $this->initializeController();
+        $this->mvcPropertyMappingConfigurationService = $this->objectManager->get(
+            'TYPO3\\CMS\\Extbase\\Mvc\\Controller\\MvcPropertyMappingConfigurationService'
+        );
     }
 
     /**
@@ -103,25 +111,53 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function processRequestWith($controller, $action, array $arguments = array(), $method = 'GET')
     {
-        $request = new Tx_Extbase_MVC_Web_Request();
+        $request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
         $request->setControllerActionName($action);
         $request->setControllerName($controller);
         $request->setMethod($method);
         $request->setControllerExtensionName($this->getExtensionName());
         $request->setHmacVerified(true);
 
+
+        $fieldNames = $this->generateFieldNames($arguments);
+        $trustedProperties = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken(
+            $fieldNames,
+            'tx_checkout_checkout'
+        );
+        $request->setArgument('__trustedProperties', $trustedProperties);
+
         foreach ($arguments as $key => $value) {
             $request->setArgument($key, $value);
         }
 
-        $response = new Tx_Extbase_MVC_Web_Response();
+        $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
 
         try {
             $this->controller->processRequest($request, $response);
-        } catch (Tx_Extbase_MVC_Exception_StopAction $ignoredException) {
+        } catch (\TYPO3\CMS\Extbase\Mvc\Exception\StopActionException $ignoredException) {
         }
 
         return $response;
+    }
+
+    /**
+     * @param array $arguments
+     * @param string $prefix
+     * @return array
+     */
+    private function generateFieldNames(array $arguments, $prefix = 'tx_checkout_checkout')
+    {
+        $fieldNames = array();
+        $format = '[%s]';
+        foreach ($arguments as $part => $value) {
+            $fieldName = $prefix . sprintf($format, $part);
+            if (is_array($value)) {
+                $fieldNames = array_merge($fieldNames, $this->generateFieldNames($value, $fieldName));
+            } else {
+                $fieldNames[] = $fieldName;
+            }
+        }
+        return $fieldNames;
     }
 
     /**
@@ -185,12 +221,14 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     /**
      * @param integer $expectedErrorCode
      * @param string $expectedErrorMessage
+     * @param string $propertyPath
      */
-    protected function assertError($expectedErrorCode, $expectedErrorMessage = '')
+    protected function assertError($expectedErrorCode, $expectedErrorMessage = '', $propertyPath = '')
     {
         $constraint = new Tx_ExtbaseFunctionals_Constraint_ErrorConstraint(
             $expectedErrorCode,
-            $expectedErrorMessage
+            $expectedErrorMessage,
+            $propertyPath
         );
         self::assertThat($this->controller, $constraint);
     }

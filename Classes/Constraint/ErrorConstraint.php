@@ -40,13 +40,20 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     private $message;
 
     /**
+     * @var string
+     */
+    private $propertyPath;
+
+    /**
      * @param integer $code
      * @param string $message
+     * @param string $propertyPath
      */
-    public function __construct($code, $message = '')
+    public function __construct($code, $message = '', $propertyPath = '')
     {
         $this->code = $code;
         $this->message = $message;
+        $this->propertyPath = $propertyPath;
         parent::__construct();
     }
 
@@ -56,49 +63,53 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
      */
     protected function matches($other)
     {
-        if ($other instanceof Tx_Extbase_MVC_Controller_AbstractController) {
-            return $this->hasError($this->getRequest($other)->getErrors());
+        if ($other instanceof \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController) {
+            return $this->checkErrors($this->getArguments($other)->getValidationResults()->getFlattenedErrors());
         }
         return false;
     }
 
     /**
-     * @param mixed $errors
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\Arguments $arguments
      * @return boolean
      */
-    private function hasError($errors)
+    private function hasError(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments $arguments)
     {
-        if (is_array($errors)) {
-            foreach ($errors as $error) {
-                if ($this->hasError($error)) {
+        foreach ($arguments as $argument) {
+            /** @var \TYPO3\CMS\Extbase\Mvc\Controller\Argument $argument */
+            /** @var \TYPO3\CMS\Extbase\Error\Result $result */
+            $result = $argument->getValidationResults();
+            if ($result->hasErrors()) {
+                if ($this->checkErrors($result->getFlattenedErrors())) {
                     return true;
                 }
             }
         }
-        if ($errors instanceof Tx_Extbase_Validation_PropertyError) {
-            if ($this->checkError($errors)) {
-                return true;
-            }
-            if ($this->hasError($errors->getErrors())) {
-                return true;
-            }
-        }
-        if ($errors instanceof Tx_Extbase_Error_Error) {
-            if ($this->checkError($errors)) {
-                return true;
-            }
-        }
         return false;
     }
 
     /**
-     * @param Tx_Extbase_Error_Error $error
+     * @param array $errors
+     * @param string $propertyPath
      * @return boolean
      */
-    private function checkError(Tx_Extbase_Error_Error $error)
+    private function checkErrors(array $errors, $propertyPath = '')
     {
-        if ($error->getCode() === $this->code && ($this->message === '' || $this->message === $error->getMessage())) {
-            return true;
+        foreach ($errors as $key => $error) {
+            if (is_string($key)) {
+                $propertyPath = trim($propertyPath . '.' . $key, '.');
+            }
+            if (is_array($error)) {
+                return $this->checkErrors($error, $propertyPath);
+            }
+            /** @var \TYPO3\CMS\Extbase\Validation\Error $error */
+            if ($error->getCode() === $this->code &&
+                ($this->message === '' || $this->message === $error->getMessage()) &&
+                ($this->propertyPath === '' || $this->propertyPath === $propertyPath)
+            ) {
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -111,9 +122,10 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     public function toString()
     {
         return sprintf(
-            'will produce error with code "%s" and message "%s"',
+            'will produce error with code "%s", message "%s" and property path "%s"',
             $this->code,
-            $this->message
+            $this->message,
+            $this->propertyPath
         );
     }
 
@@ -123,7 +135,8 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
      */
     protected function failureDescription($other)
     {
-        return $this->exporter->export($this->getRequest($other)) . ' ' . $this->toString();
+        return $this->exporter->export($this->getArguments($other)->getValidationResults()->getFlattenedErrors())
+        . ' ' . $this->toString();
     }
 
     /**
@@ -134,6 +147,18 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     {
         $reflection = new ReflectionClass($controller);
         $property = $reflection->getProperty('request');
+        $property->setAccessible(true);
+        return $property->getValue($controller);
+    }
+
+    /**
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
+     * @return \TYPO3\CMS\Extbase\Mvc\Controller\Arguments
+     */
+    private function getArguments(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
+    {
+        $reflection = new ReflectionClass($controller);
+        $property = $reflection->getProperty('arguments');
         $property->setAccessible(true);
         return $property->getValue($controller);
     }
