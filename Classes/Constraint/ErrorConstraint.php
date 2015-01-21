@@ -95,21 +95,24 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
      */
     private function checkErrors(array $errors, $propertyPath = '')
     {
+        $tmpPropertyPath = $propertyPath;
         foreach ($errors as $key => $error) {
             if (is_string($key)) {
-                $propertyPath = trim($propertyPath . '.' . $key, '.');
+                $propertyPath = trim($tmpPropertyPath . '.' . $key, '.');
             }
             if (is_array($error)) {
-                return $this->checkErrors($error, $propertyPath);
+                if(true === $this->checkErrors($error, $propertyPath)) {
+                    return true;
+                }
+            } else {
+                /** @var \TYPO3\CMS\Extbase\Validation\Error $error */
+                if ($error->getCode() === $this->code &&
+                    ($this->message === '' || $this->message === $error->getMessage()) &&
+                    ($this->propertyPath === '' || $this->propertyPath === $propertyPath)
+                ) {
+                    return true;
+                }
             }
-            /** @var \TYPO3\CMS\Extbase\Validation\Error $error */
-            if ($error->getCode() === $this->code &&
-                ($this->message === '' || $this->message === $error->getMessage()) &&
-                ($this->propertyPath === '' || $this->propertyPath === $propertyPath)
-            ) {
-                return true;
-            }
-            return false;
         }
         return false;
     }
