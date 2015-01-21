@@ -111,26 +111,24 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function processRequestWith($controller, $action, array $arguments = array(), $method = 'GET')
     {
+        $requestArguments = $this->convertArgumentsToRequestArguments($arguments);
+
+        $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
         $request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
         $request->setControllerActionName($action);
+        $request->setControllerExtensionName($this->getExtensionName());
         $request->setControllerName($controller);
         $request->setMethod($method);
-        $request->setControllerExtensionName($this->getExtensionName());
         $request->setHmacVerified(true);
 
-
-        $fieldNames = $this->generateFieldNames($arguments);
         $trustedProperties = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken(
-            $fieldNames,
+            $this->convertRequestArgumentsToFieldNames($requestArguments),
             'tx_checkout_checkout'
         );
         $request->setArgument('__trustedProperties', $trustedProperties);
-
-        foreach ($arguments as $key => $value) {
+        foreach ($requestArguments as $key => $value) {
             $request->setArgument($key, $value);
         }
-
-        $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
 
         try {
             $this->controller->processRequest($request, $response);
@@ -138,26 +136,6 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         }
 
         return $response;
-    }
-
-    /**
-     * @param array $arguments
-     * @param string $prefix
-     * @return array
-     */
-    private function generateFieldNames(array $arguments, $prefix = 'tx_checkout_checkout')
-    {
-        $fieldNames = array();
-        $format = '[%s]';
-        foreach ($arguments as $part => $value) {
-            $fieldName = $prefix . sprintf($format, $part);
-            if (is_array($value)) {
-                $fieldNames = array_merge($fieldNames, $this->generateFieldNames($value, $fieldName));
-            } else {
-                $fieldNames[] = $fieldName;
-            }
-        }
-        return $fieldNames;
     }
 
     /**
@@ -239,5 +217,70 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     {
         $constraint = new Tx_ExtbaseFunctionals_Constraint_NoErrorConstraint();
         self::assertThat($this->controller, $constraint);
+    }
+
+    /**
+     * Convert arguments (array, which can contain e.g. Domain-Model-Objects) to a flat array (as it would be used in 'normal' Web-Requests)
+     *
+     * @param array $arguments
+     * @return array
+     */
+    private function convertArgumentsToRequestArguments(array $arguments)
+    {
+        $requestArguments = array();
+        foreach ($arguments as $key => $value) {
+            if (is_object($value)) {
+                if (false === stripos(get_class($value), 'Tx_Checkout_')) {
+                    continue;
+                }
+
+                $objectArguments = array();
+                $reflection = new ReflectionClass($value);
+                foreach ($reflection->getProperties() as $property) {
+                    /* @var $property ReflectionProperty */
+                    $property->setAccessible(true);
+                    $propertyValue = $property->getValue($value);
+
+                    if (is_object($propertyValue)) {
+                        if ($propertyValue instanceof DateTime) {
+                            $propertyValue = date('d.m.Y', $propertyValue->getTimestamp());
+                        } else {
+                            //@TODO: if the property is another object, we must generate new fields for that
+                        }
+                    }
+
+                    $objectArguments[$property->getName()] = $propertyValue;
+                }
+
+                $requestArguments[$key] = $this->convertArgumentsToRequestArguments($objectArguments);
+            } else {
+                $requestArguments[$key] = $value;
+            }
+        }
+
+        return $requestArguments;
+    }
+
+    /**
+     * @param array  $requestArguments
+     * @param string $prefix
+     * @return array
+     */
+    private function convertRequestArgumentsToFieldNames(array $requestArguments, $prefix = 'tx_checkout_checkout')
+    {
+        $fieldNames = array();
+        $format = '[%s]';
+
+        foreach($requestArguments as $key => $requestArgument) {
+            $fieldName = $prefix . sprintf($format, $key);
+
+            if (is_array($requestArgument)) {
+                $fieldNames = array_merge($fieldNames, $this->convertRequestArgumentsToFieldNames($requestArgument, $fieldName));
+            } else {
+                $fieldNames[] = $fieldName;
+            }
+        }
+
+        return $fieldNames;
     }
 }
