@@ -63,7 +63,7 @@ class Tx_ExtbaseFunctionals_Constraint_ForwardConstraint extends PHPUnit_Framewo
      */
     protected function matches($other)
     {
-        if ($other instanceof Tx_Extbase_MVC_Controller_AbstractController) {
+        if ($other instanceof \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController) {
             $request = $this->getRequest($other);
             if (null !== $this->controller && $request->getControllerName() !== $this->controller) {
                 return false;
@@ -108,10 +108,10 @@ class Tx_ExtbaseFunctionals_Constraint_ForwardConstraint extends PHPUnit_Framewo
     }
 
     /**
-     * @param Tx_Extbase_MVC_Controller_AbstractController $controller
-     * @return Tx_Extbase_MVC_Request
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
+     * @return \TYPO3\CMS\Extbase\Mvc\Request
      */
-    private function getRequest(Tx_Extbase_MVC_Controller_AbstractController $controller)
+    private function getRequest(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
     {
         $reflection = new ReflectionClass($controller);
         $property = $reflection->getProperty('request');

@@ -143,10 +143,10 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
     }
 
     /**
-     * @param Tx_Extbase_MVC_Controller_AbstractController $controller
-     * @return Tx_Extbase_MVC_Request
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
+     * @return \TYPO3\CMS\Extbase\Mvc\Request
      */
-    private function getRequest(Tx_Extbase_MVC_Controller_AbstractController $controller)
+    private function getRequest(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
     {
         $reflection = new ReflectionClass($controller);
         $property = $reflection->getProperty('request');

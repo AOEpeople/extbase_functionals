@@ -50,8 +50,8 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseStubTest extends \TYPO3\CMS\Extbas
         $stub->tearDown();
         $stub->setUp($this);
 
-        /** @var Tx_Extbase_Object_Container_Container $container */
-        $container = $this->objectManager->get('Tx_Extbase_Object_Container_Container');
+        /** @var \TYPO3\CMS\Extbase\Object\Container\Container $container */
+        $container = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
         $container->registerImplementation($stub->getOriginalClassName(), get_class($stub));
 
         $this->stubs[$name] = $stub;

@@ -70,7 +70,7 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
      */
     protected function matches($other)
     {
-        if ($other instanceof Tx_Extbase_MVC_Controller_AbstractController) {
+        if ($other instanceof \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController) {
             $response = $this->getResponse($other);
             $headers = $this->getHeadersAsString($other);
             if ($this->getStatusCode($response) !== $this->statusCode) {
@@ -106,28 +106,28 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
     }
 
     /**
-     * @param Tx_Extbase_MVC_Controller_AbstractController $other
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $other
      * @return string
      */
-    protected function failureDescription(Tx_Extbase_MVC_Controller_AbstractController $other)
+    protected function failureDescription(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $other)
     {
         return '"' . $this->getHeadersAsString($other) . '" ' . $this->toString();
     }
 
     /**
-     * @param Tx_Extbase_MVC_Controller_AbstractController $controller
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
      * @return string
      */
-    private function getHeadersAsString(Tx_Extbase_MVC_Controller_AbstractController $controller)
+    private function getHeadersAsString(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
     {
         return implode("\n", $this->getResponse($controller)->getHeaders());
     }
 
     /**
-     * @param Tx_Extbase_MVC_Controller_AbstractController $controller
-     * @return Tx_Extbase_MVC_Web_Response
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
+     * @return \TYPO3\CMS\Extbase\Mvc\Web\Response
      */
-    private function getResponse(Tx_Extbase_MVC_Controller_AbstractController $controller)
+    private function getResponse(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
     {
         $reflection = new ReflectionClass($controller);
         $property = $reflection->getProperty('response');
@@ -136,10 +136,10 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
     }
 
     /**
-     * @param Tx_Extbase_MVC_Web_Response $response
+     * @param \TYPO3\CMS\Extbase\Mvc\Web\Response $response
      * @return integer
      */
-    private function getStatusCode(Tx_Extbase_MVC_Web_Response $response)
+    private function getStatusCode(\TYPO3\CMS\Extbase\Mvc\Web\Response $response)
     {
         $reflection = new ReflectionClass($response);
         $property = $reflection->getProperty('statusCode');

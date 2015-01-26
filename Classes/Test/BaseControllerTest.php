@@ -33,7 +33,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     extends Tx_ExtbaseFunctionals_Test_BaseStubTest
 {
     /**
-     * @var Tx_Extbase_MVC_Controller_ActionController
+     * @var \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected $controller;
     /**
@@ -66,10 +66,9 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function setUp()
     {
-        if (t3lib_div::compat_version('6.2')) {
-            $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        }
-        $bootstrap = new Tx_Extbase_Core_Bootstrap();
+        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+
+        $bootstrap = new \TYPO3\CMS\Extbase\Core\Bootstrap();
         $bootstrap->initialize(
             array(
                 'extensionName' => $this->getExtensionName(),
@@ -89,7 +88,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function emulateSettings(array $settings)
     {
-        $configuration = $this->getMockBuilder('Tx_Extbase_Configuration_ConfigurationManagerInterface')
+        $configuration = $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface')
             ->setMethods(array(
                 'setContentObject',
                 'getContentObject',
@@ -107,7 +106,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @param string $action
      * @param array $arguments
      * @param string $method
-     * @return Tx_Extbase_MVC_Response
+     * @return \TYPO3\CMS\Extbase\Mvc\Response
      */
     protected function processRequestWith($controller, $action, array $arguments = array(), $method = 'GET')
     {

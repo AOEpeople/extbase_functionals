@@ -27,7 +27,7 @@
  * @package ExtbaseFunctionals
  * @subpackage Stub
  */
-interface Tx_ExtbaseFunctionals_Stub_StubInterface extends t3lib_Singleton
+interface Tx_ExtbaseFunctionals_Stub_StubInterface extends \TYPO3\CMS\Core\SingletonInterface
 {
     /**
      * @param PHPUnit_Framework_TestCase $testCase
