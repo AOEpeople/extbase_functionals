@@ -36,6 +36,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @var \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected $controller;
+
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
      */
@@ -57,6 +58,16 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     abstract protected function getExtensionName();
 
     /**
+     * overwrite this method to mock settings for controller
+     *
+     * @return array
+     */
+    protected function getPluginSettings()
+    {
+        return array();
+    }
+
+    /**
      * @var \TYPO3\CMS\Extbase\Mvc\Controller\MvcPropertyMappingConfigurationService
      */
     protected $mvcPropertyMappingConfigurationService;
@@ -66,17 +77,35 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function setUp()
     {
-        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $this->initializeObjectManager();
+        $this->initializeExtbase();
+        $this->registerStubs();
+        $this->initializeController();
+    }
 
+    /**
+     * Initializes the object manager implementation
+     */
+    public function initializeObjectManager()
+    {
+        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            'TYPO3\\CMS\\Extbase\\Object\\ObjectManager'
+        );
+    }
+
+    /**
+     * Initialize/Bootstrap the extbase framework
+     */
+    public function initializeExtbase()
+    {
         $bootstrap = new \TYPO3\CMS\Extbase\Core\Bootstrap();
         $bootstrap->initialize(
             array(
                 'extensionName' => $this->getExtensionName(),
-                'pluginName' => $this->getPluginName()
+                'pluginName' => $this->getPluginName(),
+                'settings.' => $this->getPluginSettings()
             )
         );
-        $this->registerStubs();
-        $this->initializeController();
         $this->mvcPropertyMappingConfigurationService = $this->objectManager->get(
             'TYPO3\\CMS\\Extbase\\Mvc\\Controller\\MvcPropertyMappingConfigurationService'
         );
@@ -88,16 +117,26 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function emulateSettings(array $settings)
     {
+        /** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
+        $configurationManager = $this->objectManager->get(
+            'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface'
+        );
+        $configurationSettings = $configurationManager->getConfiguration(
+            \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+        );
+        $mergedSettings = array_merge($configurationSettings, $settings);
         $configuration = $this->getMockBuilder('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface')
-            ->setMethods(array(
-                'setContentObject',
-                'getContentObject',
-                'getConfiguration',
-                'setConfiguration',
-                'isFeatureEnabled',
-            ))
+            ->setMethods(
+                array(
+                    'setContentObject',
+                    'getContentObject',
+                    'getConfiguration',
+                    'setConfiguration',
+                    'isFeatureEnabled',
+                )
+            )
             ->getMock();
-        $configuration->expects($this->any())->method('getConfiguration')->will($this->returnValue($settings));
+        $configuration->expects($this->any())->method('getConfiguration')->will($this->returnValue($mergedSettings));
         $this->controller->injectConfigurationManager($configuration);
     }
 
@@ -261,7 +300,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     }
 
     /**
-     * @param array  $requestArguments
+     * @param array $requestArguments
      * @param string $prefix
      * @return array
      */
@@ -270,11 +309,14 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $fieldNames = array();
         $format = '[%s]';
 
-        foreach($requestArguments as $key => $requestArgument) {
+        foreach ($requestArguments as $key => $requestArgument) {
             $fieldName = $prefix . sprintf($format, $key);
 
             if (is_array($requestArgument)) {
-                $fieldNames = array_merge($fieldNames, $this->convertRequestArgumentsToFieldNames($requestArgument, $fieldName));
+                $fieldNames = array_merge(
+                    $fieldNames,
+                    $this->convertRequestArgumentsToFieldNames($requestArgument, $fieldName)
+                );
             } else {
                 $fieldNames[] = $fieldName;
             }
