@@ -195,18 +195,21 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @param string $expectedAction
      * @param string $expectedController
      * @param array $expectedParameters
+     * @param integer $expectedPageUid
      * @param integer $expectedStatusCode
      */
     protected function assertRedirect(
         $expectedAction,
         $expectedController = null,
         array $expectedParameters = array(),
+        $expectedPageUid = null,
         $expectedStatusCode = 303
     ) {
         $constraint = new Tx_ExtbaseFunctionals_Constraint_RedirectConstraint(
             $expectedAction,
             $expectedController,
             $expectedParameters,
+            $expectedPageUid,
             $expectedStatusCode
         );
         self::assertThat($this->controller, $constraint);

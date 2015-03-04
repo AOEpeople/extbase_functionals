@@ -47,20 +47,27 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
     /**
      * @var integer
      */
+    private $pageUid;
+
+    /**
+     * @var integer
+     */
     private $statusCode;
 
     /**
      * @param string $action
      * @param string $controller
      * @param array $arguments
+     * @param integer $pageUid
      * @param integer $statusCode
      */
-    public function __construct($action, $controller = null, array $arguments = array(), $statusCode = 303)
+    public function __construct($action, $controller = null, array $arguments = array(), $pageUid = null, $statusCode = 303)
     {
         $this->action = $action;
         $this->controller = $controller;
         $this->arguments = $arguments;
         $this->statusCode = $statusCode;
+        $this->pageUid = $pageUid;
         parent::__construct();
     }
 
@@ -83,6 +90,14 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
             }
             foreach ($this->arguments as $key => $value) {
                 if (false === strpos($headers, $key . '%5D=' . $value)) {
+                    return false;
+                }
+            }
+            if (null !== $this->pageUid) {
+                if ($this->getUriBuilder($other)->getTargetPageUid() !== $this->pageUid ||
+                    false === strpos($response, 'http-equiv="refresh" content="0;url=') ||
+                    false === strpos($headers, 'Location:')
+                ) {
                     return false;
                 }
             }
@@ -145,5 +160,17 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
         $property = $reflection->getProperty('statusCode');
         $property->setAccessible(true);
         return $property->getValue($response);
+    }
+
+    /**
+     * @param \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller
+     * @return \TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder
+     */
+    private function getUriBuilder(\TYPO3\CMS\Extbase\Mvc\Controller\AbstractController $controller)
+    {
+        $reflection = new ReflectionClass($controller);
+        $property = $reflection->getProperty('uriBuilder');
+        $property->setAccessible(true);
+        return $property->getValue($controller);
     }
 }
