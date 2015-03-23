@@ -271,7 +271,8 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $requestArguments = array();
         foreach ($arguments as $key => $value) {
             if (is_object($value)) {
-                if (false === stripos(get_class($value), 'Tx_Checkout_')) {
+                if (false === stripos(get_class($value), 'Tx_Checkout_') &&
+                    false === stripos(get_class($value), 'Aoe\Checkout')) {
                     continue;
                 }
 
