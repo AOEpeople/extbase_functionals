@@ -162,7 +162,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $trustedProperties = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken(
             $this->convertRequestArgumentsToFieldNames($requestArguments),
             'tx_checkout_checkout'
-        );
+        ); // @FIXME: no dependecies to checkout!
         $request->setArgument('__trustedProperties', $trustedProperties);
         foreach ($requestArguments as $key => $value) {
             $request->setArgument($key, $value);
@@ -274,7 +274,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
                 if (false === stripos(get_class($value), 'Tx_Checkout_') &&
                     false === stripos(get_class($value), 'Aoe\Checkout')) {
                     continue;
-                }
+                } //@FIXME: No Dependencies to checkout!
 
                 $objectArguments = array();
                 $reflection = new ReflectionClass($value);
@@ -307,6 +307,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @param array $requestArguments
      * @param string $prefix
      * @return array
+     * @FIXME: no dependencies to checkout!
      */
     private function convertRequestArgumentsToFieldNames(array $requestArguments, $prefix = 'tx_checkout_checkout')
     {
