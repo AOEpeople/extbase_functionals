@@ -23,11 +23,16 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Aoe\ExtbaseFunctionals\Constraint;
+
+use PHPUnit_Framework_Constraint;
+use ReflectionClass;
+
 /**
  * @package ExtbaseFunctionals
  * @subpackage Constraint
  */
-class Tx_ExtbaseFunctionals_Constraint_NoErrorConstraint extends PHPUnit_Framework_Constraint
+class NoErrorConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * @param mixed $other

@@ -23,11 +23,17 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Aoe\ExtbaseFunctionals\Constraint;
+
+use PHPUnit_Framework_Constraint;
+use DOMDocument;
+use DOMXpath;
+
 /**
  * @package ExtbaseFunctionals
  * @subpackage Constraint
  */
-class Tx_ExtbaseFunctionals_Constraint_XPathConstraint extends PHPUnit_Framework_Constraint
+class XPathConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * @var string

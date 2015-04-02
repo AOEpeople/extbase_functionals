@@ -22,6 +22,19 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+namespace Aoe\ExtbaseFunctionals\Test;
+
+use Aoe\ExtbaseFunctionals\Configuration\FunctionalTestConfigurationInterface;
+use Aoe\ExtbaseFunctionals\Constraint\ErrorConstraint;
+use Aoe\ExtbaseFunctionals\Constraint\ForwardConstraint;
+use Aoe\ExtbaseFunctionals\Constraint\NoErrorConstraint;
+use Aoe\ExtbaseFunctionals\Constraint\RedirectConstraint;
+use Aoe\ExtbaseFunctionals\Constraint\XPathConstraint;
+use DateTime;
+use PHPUnit_Framework_Constraint_Not;
+use ReflectionClass;
+use ReflectionProperty;
+use Aoe\ExtbaseFunctionals\Test\BaseStubTest;
 
 /**
  * Base class for controller tests.
@@ -29,8 +42,8 @@
  * @package ExtbaseFunctionals
  * @subpackage Test
  */
-abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
-    extends Tx_ExtbaseFunctionals_Test_BaseStubTest
+abstract class BaseControllerTest
+    extends BaseStubTest
 {
     /**
      * @var \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
@@ -38,9 +51,9 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     protected $controller;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+     * @var FunctionalTestConfigurationInterface
      */
-    protected $objectManager;
+    protected $configuration;
 
     /**
      * @return string
@@ -48,24 +61,9 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     abstract protected function initializeController();
 
     /**
-     * @return string
+     * @return FunctionalTestConfigurationInterface
      */
-    abstract protected function getPluginName();
-
-    /**
-     * @return string
-     */
-    abstract protected function getExtensionName();
-
-    /**
-     * overwrite this method to mock settings for controller
-     *
-     * @return array
-     */
-    protected function getPluginSettings()
-    {
-        return array();
-    }
+    abstract protected function getFunctionalTestConfiguration();
 
     /**
      * @var \TYPO3\CMS\Extbase\Mvc\Controller\MvcPropertyMappingConfigurationService
@@ -77,6 +75,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     public function setUp()
     {
+        $this->initializeFunctionalTestConfiguration();
         $this->initializeObjectManager();
         $this->initializeExtbase();
         $this->registerStubs();
@@ -86,24 +85,22 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
     /**
      * Initializes the object manager implementation
      */
-    public function initializeObjectManager()
+    protected function initializeFunctionalTestConfiguration()
     {
-        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            'TYPO3\\CMS\\Extbase\\Object\\ObjectManager'
-        );
+        $this->configuration = $this->getFunctionalTestConfiguration();
     }
 
     /**
      * Initialize/Bootstrap the extbase framework
      */
-    public function initializeExtbase()
+    protected function initializeExtbase()
     {
         $bootstrap = new \TYPO3\CMS\Extbase\Core\Bootstrap();
         $bootstrap->initialize(
             array(
-                'extensionName' => $this->getExtensionName(),
-                'pluginName' => $this->getPluginName(),
-                'settings.' => $this->getPluginSettings()
+                'extensionName' => $this->configuration->getExtensionName(),
+                'pluginName' => $this->configuration->getPluginName(),
+                'settings.' => $this->configuration->getPluginSettings()
             )
         );
         $this->mvcPropertyMappingConfigurationService = $this->objectManager->get(
@@ -115,7 +112,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @param array $settings
      * @return void
      */
-    public function emulateSettings(array $settings)
+    protected function emulateSettings(array $settings)
     {
         /** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
         $configurationManager = $this->objectManager->get(
@@ -149,19 +146,28 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function processRequestWith($controller, $action, array $arguments = array(), $method = 'GET')
     {
+        if (null !== $this->configuration->getVendorName()) {
+            $arguments = array_merge(
+                $arguments,
+                array(
+                    '@vendor' => $this->configuration->getVendorName()
+                )
+            );
+        }
+
         $requestArguments = $this->convertArgumentsToRequestArguments($arguments);
 
         $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
         $request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
         $request->setControllerActionName($action);
-        $request->setControllerExtensionName($this->getExtensionName());
+        $request->setControllerExtensionName($this->configuration->getExtensionName());
         $request->setControllerName($controller);
         $request->setMethod($method);
         $request->setHmacVerified(true);
-
+        $prefix = 'tx_' . strtolower($this->configuration->getExtensionName()) . '_' . $this->configuration->getPluginName();
         $trustedProperties = $this->mvcPropertyMappingConfigurationService->generateTrustedPropertiesToken(
-            $this->convertRequestArgumentsToFieldNames($requestArguments),
-            'tx_checkout_checkout'
+            $this->convertRequestArgumentsToFieldNames($requestArguments, $prefix),
+            $prefix
         );
         $request->setArgument('__trustedProperties', $trustedProperties);
         foreach ($requestArguments as $key => $value) {
@@ -183,7 +189,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function assertForward($expectedAction, $expectedController, array $expectedParameters = array())
     {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_ForwardConstraint(
+        $constraint = new ForwardConstraint(
             $expectedAction,
             $expectedController,
             $expectedParameters
@@ -205,7 +211,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $expectedPageUid = null,
         $expectedStatusCode = 303
     ) {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_RedirectConstraint(
+        $constraint = new RedirectConstraint(
             $expectedAction,
             $expectedController,
             $expectedParameters,
@@ -222,7 +228,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function assertXPathPresent($actualString, $expectedPath)
     {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_XPathConstraint($expectedPath);
+        $constraint = new XPathConstraint($expectedPath);
         self::assertThat($actualString, $constraint);
     }
 
@@ -232,7 +238,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function assertXPathNotPresent($actualString, $expectedPath)
     {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_XPathConstraint($expectedPath);
+        $constraint = new XPathConstraint($expectedPath);
         $not = new PHPUnit_Framework_Constraint_Not($constraint);
         self::assertThat($actualString, $not);
     }
@@ -244,7 +250,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function assertError($expectedErrorCode, $expectedErrorMessage = '', $propertyPath = '')
     {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_ErrorConstraint(
+        $constraint = new ErrorConstraint(
             $expectedErrorCode,
             $expectedErrorMessage,
             $propertyPath
@@ -256,7 +262,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      */
     protected function assertNoError()
     {
-        $constraint = new Tx_ExtbaseFunctionals_Constraint_NoErrorConstraint();
+        $constraint = new NoErrorConstraint();
         self::assertThat($this->controller, $constraint);
     }
 
@@ -271,8 +277,12 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
         $requestArguments = array();
         foreach ($arguments as $key => $value) {
             if (is_object($value)) {
-                if (false === stripos(get_class($value), 'Tx_Checkout_') &&
-                    false === stripos(get_class($value), 'Aoe\Checkout')) {
+                if (false === stripos(get_class($value), 'Tx_' . $this->configuration->getExtensionName() . '_') &&
+                    false === stripos(
+                        get_class($value),
+                        $this->configuration->getVendorName() . '\\' . $this->configuration->getExtensionName()
+                    )
+                ) {
                     continue;
                 }
 
@@ -308,7 +318,7 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseControllerTest
      * @param string $prefix
      * @return array
      */
-    private function convertRequestArgumentsToFieldNames(array $requestArguments, $prefix = 'tx_checkout_checkout')
+    private function convertRequestArgumentsToFieldNames(array $requestArguments, $prefix = '')
     {
         $fieldNames = array();
         $format = '[%s]';

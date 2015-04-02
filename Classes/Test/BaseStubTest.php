@@ -22,13 +22,22 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+namespace Aoe\ExtbaseFunctionals\Test;
+
+use Aoe\ExtbaseFunctionals\Stub\StubInterface;
+use RuntimeException;
 
 /**
  * @package ExtbaseFunctionals
  * @subpackage Test
  */
-abstract class Tx_ExtbaseFunctionals_Test_BaseStubTest extends \TYPO3\CMS\Extbase\Tests\Unit\BaseTestCase
+abstract class BaseStubTest extends \TYPO3\CMS\Extbase\Tests\Unit\BaseTestCase
 {
+    /**
+     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+     */
+    protected $objectManager;
+
     /**
      * @var array
      */
@@ -40,12 +49,22 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseStubTest extends \TYPO3\CMS\Extbas
     abstract protected function registerStubs();
 
     /**
+     * Initializes the object manager implementation
+     */
+    protected function initializeObjectManager()
+    {
+        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            'TYPO3\\CMS\\Extbase\\Object\\ObjectManager'
+        );
+    }
+
+    /**
      * @param string $name
      * @return void
      */
     protected function registerStub($name)
     {
-        /** @var Tx_ExtbaseFunctionals_Stub_StubInterface $stub */
+        /** @var StubInterface $stub */
         $stub = $this->objectManager->get($name);
         $stub->tearDown();
         $stub->setUp($this);
@@ -59,16 +78,18 @@ abstract class Tx_ExtbaseFunctionals_Test_BaseStubTest extends \TYPO3\CMS\Extbas
 
     /**
      * @param string $name
-     * @return Tx_ExtbaseFunctionals_Stub_StubInterface
+     * @return StubInterface
      * @throws RuntimeException
      */
     protected function getStub($name)
     {
-        if (false === $this->stubs[$name] instanceof Tx_ExtbaseFunctionals_Stub_StubInterface) {
+        if (false === $this->stubs[$name] instanceof StubInterface) {
             throw new RuntimeException('A Stub with the name "' . $name . '" is not registered', 1409569219);
         }
-        $this->stubs[$name]->tearDown();
-        $this->stubs[$name]->setUp($this);
-        return $this->stubs[$name];
+        /** @var StubInterface $stub */
+        $stub = $this->stubs[$name];
+        $stub->tearDown();
+        $stub->setUp($this);
+        return $stub;
     }
 }

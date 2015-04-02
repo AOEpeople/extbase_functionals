@@ -22,12 +22,17 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+namespace Aoe\ExtbaseFunctionals\Stub;
+
+use Aoe\ExtbaseFunctionals\DataBuilder\AbstractBuilder;
+use PHPUnit_Framework_TestCase;
+use TYPO3\CMS\Core\SingletonInterface;
 
 /**
  * @package ExtbaseFunctionals
  * @subpackage Stub
  */
-interface Tx_ExtbaseFunctionals_Stub_StubInterface extends \TYPO3\CMS\Core\SingletonInterface
+interface StubInterface extends SingletonInterface
 {
     /**
      * @param PHPUnit_Framework_TestCase $testCase
@@ -41,7 +46,7 @@ interface Tx_ExtbaseFunctionals_Stub_StubInterface extends \TYPO3\CMS\Core\Singl
     public function tearDown();
 
     /**
-     * @return Tx_ExtbaseFunctionals_DataBuilder_AbstractBuilder
+     * @return AbstractBuilder
      */
     public function getBuilder();
 

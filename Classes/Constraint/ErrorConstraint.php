@@ -23,11 +23,16 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Aoe\ExtbaseFunctionals\Constraint;
+
+use PHPUnit_Framework_Constraint;
+use ReflectionClass;
+
 /**
  * @package ExtbaseFunctionals
  * @subpackage Constraint
  */
-class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework_Constraint
+class ErrorConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * @var integer
@@ -101,7 +106,7 @@ class Tx_ExtbaseFunctionals_Constraint_ErrorConstraint extends PHPUnit_Framework
                 $propertyPath = trim($tmpPropertyPath . '.' . $key, '.');
             }
             if (is_array($error)) {
-                if(true === $this->checkErrors($error, $propertyPath)) {
+                if (true === $this->checkErrors($error, $propertyPath)) {
                     return true;
                 }
             } else {

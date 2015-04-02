@@ -23,11 +23,16 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Aoe\ExtbaseFunctionals\Constraint;
+
+use PHPUnit_Framework_Constraint;
+use ReflectionClass;
+
 /**
  * @package ExtbaseFunctionals
  * @subpackage Constraint
  */
-class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framework_Constraint
+class RedirectConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * @var string
@@ -61,8 +66,13 @@ class Tx_ExtbaseFunctionals_Constraint_RedirectConstraint extends PHPUnit_Framew
      * @param integer $pageUid
      * @param integer $statusCode
      */
-    public function __construct($action, $controller = null, array $arguments = array(), $pageUid = null, $statusCode = 303)
-    {
+    public function __construct(
+        $action,
+        $controller = null,
+        array $arguments = array(),
+        $pageUid = null,
+        $statusCode = 303
+    ) {
         $this->action = $action;
         $this->controller = $controller;
         $this->arguments = $arguments;

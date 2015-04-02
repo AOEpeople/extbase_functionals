@@ -23,37 +23,31 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-namespace Aoe\ExtbaseFunctionals\DataBuilder;
-
-use PHPUnit_Framework_TestCase;
+namespace Aoe\ExtbaseFunctionals\Configuration;
 
 /**
  * @package ExtbaseFunctionals
- * @subpackage DataBuilder
+ * @subpackage Configuration
  */
-abstract class AbstractBuilder
+interface FunctionalTestConfigurationInterface
 {
     /**
-     * @var object
+     * @return string
      */
-    protected $object;
+    public function getExtensionName();
 
     /**
-     * @param PHPUnit_Framework_TestCase $testCase
+     * @return string
      */
-    public function __construct(PHPUnit_Framework_TestCase $testCase)
-    {
-        $this->testCase = $testCase;
-        $this->object = $this->getObject();
-    }
+    public function getVendorName();
 
     /**
-     * @return object
+     * @return string
      */
-    abstract public function build();
+    public function getPluginName();
 
     /**
-     * @return object
+     * @return array
      */
-    abstract protected function getObject();
+    public function getPluginSettings();
 }

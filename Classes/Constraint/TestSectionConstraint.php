@@ -23,11 +23,15 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Aoe\ExtbaseFunctionals\Constraint;
+
+use PHPUnit_Framework_Constraint;
+
 /**
  * @package ExtbaseFunctionals
  * @subpackage Constraint
  */
-class Tx_ExtbaseFunctionals_Constraint_TestSectionConstraint extends PHPUnit_Framework_Constraint
+class TestSectionConstraint extends PHPUnit_Framework_Constraint
 {
     /**
      * @var string
