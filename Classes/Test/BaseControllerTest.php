@@ -284,7 +284,7 @@ abstract class BaseControllerTest
                     )
                 ) {
                     continue;
-                }
+                } //@FIXME: No Dependencies to checkout!
 
                 $objectArguments = array();
                 $reflection = new ReflectionClass($value);
@@ -317,6 +317,7 @@ abstract class BaseControllerTest
      * @param array $requestArguments
      * @param string $prefix
      * @return array
+     * @FIXME: no dependencies to checkout!
      */
     private function convertRequestArgumentsToFieldNames(array $requestArguments, $prefix = '')
     {
