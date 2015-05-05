@@ -38,20 +38,20 @@ interface StubInterface extends SingletonInterface
      * @param PHPUnit_Framework_TestCase $testCase
      * @return void
      */
-    public function setUp(PHPUnit_Framework_TestCase $testCase);
+    public static function setUp(PHPUnit_Framework_TestCase $testCase);
 
     /**
      * @return void
      */
-    public function tearDown();
+    public static function tearDown();
 
     /**
      * @return AbstractBuilder
      */
-    public function getBuilder();
+    public static function getBuilder();
 
     /**
      * @return string
      */
-    public function getOriginalClassName();
+    public static function getOriginalClassName();
 }

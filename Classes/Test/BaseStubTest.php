@@ -66,12 +66,12 @@ abstract class BaseStubTest extends \TYPO3\CMS\Extbase\Tests\Unit\BaseTestCase
     {
         /** @var StubInterface $stub */
         $stub = $this->objectManager->get($name);
-        $stub->tearDown();
-        $stub->setUp($this);
+        $stub::tearDown();
+        $stub::setUp($this);
 
         /** @var \TYPO3\CMS\Extbase\Object\Container\Container $container */
         $container = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
-        $container->registerImplementation($stub->getOriginalClassName(), get_class($stub));
+        $container->registerImplementation($stub::getOriginalClassName(), get_class($stub));
 
         $this->stubs[$name] = $stub;
     }
@@ -88,8 +88,8 @@ abstract class BaseStubTest extends \TYPO3\CMS\Extbase\Tests\Unit\BaseTestCase
         }
         /** @var StubInterface $stub */
         $stub = $this->stubs[$name];
-        $stub->tearDown();
-        $stub->setUp($this);
+        $stub::tearDown();
+        $stub::setUp($this);
         return $stub;
     }
 }
