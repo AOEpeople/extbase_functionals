@@ -31,7 +31,7 @@ use RuntimeException;
  * @package ExtbaseFunctionals
  * @subpackage Test
  */
-abstract class BaseStubTest extends \TYPO3\CMS\Extbase\Tests\Unit\BaseTestCase
+abstract class BaseStubTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
 {
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
