@@ -35,6 +35,23 @@ use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 abstract class BaseStubTest extends FunctionalTestCase
 {
     /**
+     * @var array
+     */
+    protected $coreExtensionsToLoad = array(
+        'core',
+        'backend',
+        'frontend',
+        'lang',
+        'extbase',
+        'install',
+    );
+
+    /**
+     * @var array
+     */
+    protected $testExtensionsToLoad = array('typo3conf/ext/extbase_functionals');
+
+    /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
      */
     protected $objectManager;
