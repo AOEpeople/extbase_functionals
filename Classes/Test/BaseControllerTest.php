@@ -75,6 +75,7 @@ abstract class BaseControllerTest
      */
     public function setUp()
     {
+        parent::setUp();
         $this->initializeFunctionalTestConfiguration();
         $this->initializeObjectManager();
         $this->initializeExtbase();
