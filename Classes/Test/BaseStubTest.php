@@ -26,12 +26,13 @@ namespace Aoe\ExtbaseFunctionals\Test;
 
 use Aoe\ExtbaseFunctionals\Stub\StubInterface;
 use RuntimeException;
+use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 
 /**
  * @package ExtbaseFunctionals
  * @subpackage Test
  */
-abstract class BaseStubTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
+abstract class BaseStubTest extends FunctionalTestCase
 {
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
