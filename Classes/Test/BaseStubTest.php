@@ -44,6 +44,18 @@ abstract class BaseStubTest extends FunctionalTestCase
         'lang',
         'extbase',
         'install',
+        'scheduler',
+        'fluid',
+    );
+
+    /**
+     * @var array
+     */
+    protected $configurationToUseInTestInstance = array(
+        'SYS' => array(
+            'encryptionKey' => 'fc86c6ab5c35074c5c72d2a851143eca',
+            'trustedHostsPattern' => '.*',
+        ),
     );
 
     /**
