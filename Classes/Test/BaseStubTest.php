@@ -25,44 +25,14 @@
 namespace Aoe\ExtbaseFunctionals\Test;
 
 use Aoe\ExtbaseFunctionals\Stub\StubInterface;
-use RuntimeException;
-use TYPO3\CMS\Core\Tests\FunctionalTestCase;
+use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * @package ExtbaseFunctionals
  * @subpackage Test
  */
-abstract class BaseStubTest extends FunctionalTestCase
+abstract class BaseStubTest extends UnitTestCase
 {
-    /**
-     * @var array
-     */
-    protected $coreExtensionsToLoad = array(
-        'core',
-        'backend',
-        'frontend',
-        'lang',
-        'extbase',
-        'install',
-        'scheduler',
-        'fluid',
-    );
-
-    /**
-     * @var array
-     */
-    protected $configurationToUseInTestInstance = array(
-        'SYS' => array(
-            'encryptionKey' => 'fc86c6ab5c35074c5c72d2a851143eca',
-            'trustedHostsPattern' => '.*',
-        ),
-    );
-
-    /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = array('typo3conf/ext/extbase_functionals');
-
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
      */
@@ -109,12 +79,12 @@ abstract class BaseStubTest extends FunctionalTestCase
     /**
      * @param string $name
      * @return StubInterface
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     protected function getStub($name)
     {
         if (false === $this->stubs[$name] instanceof StubInterface) {
-            throw new RuntimeException('A Stub with the name "' . $name . '" is not registered', 1409569219);
+            throw new \RuntimeException('A Stub with the name "' . $name . '" is not registered', 1409569219);
         }
         /** @var StubInterface $stub */
         $stub = $this->stubs[$name];
