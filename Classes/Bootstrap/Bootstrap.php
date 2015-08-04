@@ -101,7 +101,7 @@ class Bootstrap
         $setUpLocalConfiguration->setAccessible(true);
         $setUpLocalConfiguration->invoke(
             self::$functionalTestCaseBootstrapUtility,
-            array('scheduler', 'fluid'),
+            array('scheduler', 'fluid', 'rtehtmlarea'),
             $extensions
         );
 
