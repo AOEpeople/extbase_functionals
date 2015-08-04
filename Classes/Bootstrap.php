@@ -27,6 +27,7 @@ namespace Aoe\ExtbaseFunctionals;
 use Aoe\ExtbaseFunctionals\Bootstrap\Bootstrap;
 
 require_once dirname(__FILE__) . '/Bootstrap/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../../../typo3/sysext/core/Tests/Exception.php';
 require_once dirname(__FILE__) . '/../../../../typo3/sysext/core/Tests/FunctionalTestCaseBootstrapUtility.php';
 
 $bootstrap = new Bootstrap();
