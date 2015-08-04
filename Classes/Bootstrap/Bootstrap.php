@@ -96,12 +96,16 @@ class Bootstrap
      */
     public function setUpPackageStates()
     {
+        $additionalCoreExtensions = array();
+        if (defined('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION')) {
+            $additionalCoreExtensions = explode(',', constant('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION'));
+        }
         $extensions = array_diff(scandir($this->getWebRoot() . 'typo3conf/ext/'), array('..', '.'));
         $setUpLocalConfiguration = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('setUpPackageStates');
         $setUpLocalConfiguration->setAccessible(true);
         $setUpLocalConfiguration->invoke(
             self::$functionalTestCaseBootstrapUtility,
-            array('scheduler', 'fluid', 'rtehtmlarea'),
+            $additionalCoreExtensions,
             $extensions
         );
 
