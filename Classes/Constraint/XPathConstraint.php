@@ -55,6 +55,7 @@ class XPathConstraint extends PHPUnit_Framework_Constraint
      */
     protected function matches($other)
     {
+        libxml_use_internal_errors(true);
         $document = new DOMDocument();
         $document->loadHTML($other);
         $xpath = new DOMXpath($document);
