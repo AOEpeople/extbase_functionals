@@ -27,13 +27,17 @@ namespace Aoe\ExtbaseFunctionals\Bootstrap;
 use TYPO3\CMS\Core\Tests\FunctionalTestCaseBootstrapUtility;
 
 /**
+ * Covers the functionality from FunctionalTestCaseBootstrapUtility which is provided by TYPO3
+ * but allows us to create only one test instance for each extension. TYPO3 by default, create a
+ * test instance and database for each test case which causes a lot of overhead.
+ *
  * @package ExtbaseFunctionals
  * @subpackage Bootstrap
  */
 class Bootstrap
 {
     /**
-     * @var Bootstrap
+     * @var FunctionalTestCaseBootstrapUtility
      */
     private static $functionalTestCaseBootstrapUtility;
 
@@ -48,135 +52,28 @@ class Bootstrap
     public function __construct()
     {
         self::$functionalTestCaseBootstrapUtility = new FunctionalTestCaseBootstrapUtility();
-        self::$functionalTestCaseBootstrapUtilityReflection = new \ReflectionClass(self::$functionalTestCaseBootstrapUtility);
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function defineSitePath()
-    {
-        define('PATH_site', $this->getWebRoot());
-        define('ORIGINAL_ROOT', PATH_site);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function setUpInstancePath()
-    {
-        $instancePath = self::$functionalTestCaseBootstrapUtilityReflection->getProperty('instancePath');
-        $instancePath->setAccessible(true);
-        $instancePath->setValue(self::$functionalTestCaseBootstrapUtility, PATH_site);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function setUpLocalConfiguration()
-    {
-        $setUpLocalConfiguration = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('setUpLocalConfiguration');
-        $setUpLocalConfiguration->setAccessible(true);
-        $setUpLocalConfiguration->invoke(self::$functionalTestCaseBootstrapUtility, array(
-            'SYS' => array(
-                'encryptionKey' => 'fc86c6ab5c35074c5c72d2a851143eca',
-                'trustedHostsPattern' => '.*',
-            )
-        ));
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function setUpPackageStates()
-    {
-        $additionalCoreExtensions = array();
-        if (defined('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION')) {
-            $additionalCoreExtensions = explode(',', constant('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION'));
-        }
-        $extensions = array_diff(scandir($this->getWebRoot() . 'typo3conf/ext/'), array('..', '.'));
-        $setUpLocalConfiguration = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('setUpPackageStates');
-        $setUpLocalConfiguration->setAccessible(true);
-        $setUpLocalConfiguration->invoke(
-            self::$functionalTestCaseBootstrapUtility,
-            $additionalCoreExtensions,
-            $extensions
+        self::$functionalTestCaseBootstrapUtilityReflection = new \ReflectionClass(
+            self::$functionalTestCaseBootstrapUtility
         );
-
-        return $this;
     }
 
     /**
-     * @return Bootstrap
+     * set up
+     * @return void
      */
-    public function setUpBasicTypo3Bootstrap()
+    public function setUp()
     {
-        $setUpLocalConfiguration = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('setUpBasicTypo3Bootstrap');
-        $setUpLocalConfiguration->setAccessible(true);
-        $setUpLocalConfiguration->invoke(self::$functionalTestCaseBootstrapUtility);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function setUpTestDatabase()
-    {
-        $method = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('setUpTestDatabase');
-        $method->setAccessible(true);
-        $method->invoke(self::$functionalTestCaseBootstrapUtility);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function loadExtensionTables()
-    {
-        \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->loadExtensionTables(true);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function initializeTestDatabase()
-    {
-        $method = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('initializeTestDatabase');
-        $method->setAccessible(true);
-        $method->invoke(self::$functionalTestCaseBootstrapUtility);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function createDatabaseStructure()
-    {
-        $method = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('createDatabaseStructure');
-        $method->setAccessible(true);
-        $method->invoke(self::$functionalTestCaseBootstrapUtility);
-
-        return $this;
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    public function registerShutdownTestDatabase()
-    {
-
-        register_shutdown_function(array($this, 'tearDownTestDatabase'));
+        $this->defineSitePath();
+        self::$functionalTestCaseBootstrapUtility->setUp(
+            uniqid('extbase_functionals'),
+            $this->getAdditionalCoreExtensions(),
+            $this->getExtensions(),
+            array(),
+            array(),
+            array()
+        );
+        $this->registerShutdownTestDatabase();
+        $this->registerShutdownTestInstance();
     }
 
     /**
@@ -190,16 +87,75 @@ class Bootstrap
     }
 
     /**
+     * @return void
+     */
+    public static function tearDownTestInstance()
+    {
+        $method = self::$functionalTestCaseBootstrapUtilityReflection->getMethod('removeOldInstanceIfExists');
+        $method->setAccessible(true);
+        $method->invoke(self::$functionalTestCaseBootstrapUtility);
+    }
+
+    /**
+     * @return Bootstrap
+     */
+    private function registerShutdownTestDatabase()
+    {
+
+        register_shutdown_function(array($this, 'tearDownTestDatabase'));
+    }
+
+    /**
+     * @return Bootstrap
+     */
+    private function registerShutdownTestInstance()
+    {
+
+        register_shutdown_function(array($this, 'tearDownTestInstance'));
+    }
+
+    /**
+     * @return array
+     */
+    private function getAdditionalCoreExtensions()
+    {
+        $additionalCoreExtensions = array();
+        if (defined('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION')) {
+            $additionalCoreExtensions = explode(',', constant('EXTBASE_FUNCTIONALS_ADDITIONAL_CORE_EXTENSION'));
+        }
+        return $additionalCoreExtensions;
+    }
+
+    /**
+     * @return array
+     */
+    private function getExtensions()
+    {
+        $extensionDir = $this->getWebRoot() . '/typo3conf/ext/';
+        $extensions = array_diff(scandir($extensionDir), array('..', '.'));
+        array_walk($extensions, function (&$item) {
+            $item = 'typo3conf/ext/' . $item;
+        });
+        return $extensions;
+    }
+
+    /**
+     * @return Bootstrap
+     */
+    private function defineSitePath()
+    {
+        define('PATH_site', $this->getWebRoot());
+        define('ORIGINAL_ROOT', PATH_site);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
-    protected function getWebRoot()
+    private function getWebRoot()
     {
-        if (getenv('TYPO3_PATH_WEB')) {
-            $webRoot = getenv('TYPO3_PATH_WEB') . '/';
-        } else {
-            $webRoot = getcwd() . '/';
-        }
-
-        return strtr($webRoot, '\\', '/');
+        $webRoot = realpath(dirname(__FILE__) . '/../../../../../');
+        return strtr($webRoot, '\\', '/') . DIRECTORY_SEPARATOR;
     }
 }

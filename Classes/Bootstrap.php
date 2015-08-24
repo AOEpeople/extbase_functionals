@@ -22,6 +22,7 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 namespace Aoe\ExtbaseFunctionals;
 
 use Aoe\ExtbaseFunctionals\Bootstrap\Bootstrap;
@@ -31,14 +32,4 @@ require_once dirname(__FILE__) . '/../../../../typo3/sysext/core/Tests/Exception
 require_once dirname(__FILE__) . '/../../../../typo3/sysext/core/Tests/FunctionalTestCaseBootstrapUtility.php';
 
 $bootstrap = new Bootstrap();
-$bootstrap
-    ->defineSitePath()
-    ->setUpInstancePath()
-    ->setUpLocalConfiguration()
-    ->setUpPackageStates()
-    ->setUpBasicTypo3Bootstrap()
-    ->setUpTestDatabase()
-    ->loadExtensionTables()
-    ->initializeTestDatabase()
-    ->createDatabaseStructure()
-    ->registerShutdownTestDatabase();
+$bootstrap->setUp();
