@@ -58,25 +58,6 @@ class Bootstrap
     }
 
     /**
-     * set up
-     * @return void
-     */
-    public function setUp()
-    {
-        $this->defineSitePath();
-        self::$functionalTestCaseBootstrapUtility->setUp(
-            uniqid('extbase_functionals'),
-            $this->getAdditionalCoreExtensions(),
-            $this->getExtensions(),
-            array(),
-            array(),
-            array()
-        );
-        $this->registerShutdownTestDatabase();
-        $this->registerShutdownTestInstance();
-    }
-
-    /**
      * @return void
      */
     public static function tearDownTestDatabase()
@@ -97,21 +78,26 @@ class Bootstrap
     }
 
     /**
-     * @return Bootstrap
+     * set up
+     * @return void
      */
-    private function registerShutdownTestDatabase()
+    public function setUp()
     {
-
-        register_shutdown_function(array($this, 'tearDownTestDatabase'));
-    }
-
-    /**
-     * @return Bootstrap
-     */
-    private function registerShutdownTestInstance()
-    {
-
-        register_shutdown_function(array($this, 'tearDownTestInstance'));
+        self::$functionalTestCaseBootstrapUtility->setUp(
+            uniqid('extbase_functionals'),
+            $this->getAdditionalCoreExtensions(),
+            $this->getExtensions(),
+            $this->getAdditionalPaths(),
+            array(
+                'SYS' => array(
+                    'encryptionKey' => 'fc86c6ab5c35074c5c72d2a851143eca',
+                    'trustedHostsPattern' => '.*',
+                )
+            ),
+            array()
+        );
+        $this->registerShutdownTestDatabase();
+        $this->registerShutdownTestInstance();
     }
 
     /**
@@ -129,9 +115,26 @@ class Bootstrap
     /**
      * @return array
      */
+    private function getAdditionalPaths()
+    {
+        $additionalPaths = array();
+        if (defined('EXTBASE_FUNCTIONALS_ADDITIONAL_PATHS')) {
+            $additionalPaths = explode(',', constant('EXTBASE_FUNCTIONALS_ADDITIONAL_PATHS'));
+        }
+        $parsed = array();
+        foreach ($additionalPaths as $full) {
+            $pieces = explode(':', $full);
+            $parsed[$pieces[0]] = $pieces[1];
+        }
+        return $parsed;
+    }
+
+    /**
+     * @return array
+     */
     private function getExtensions()
     {
-        $extensionDir = $this->getWebRoot() . '/typo3conf/ext/';
+        $extensionDir = ORIGINAL_ROOT . '/typo3conf/ext/';
         $extensions = array_diff(scandir($extensionDir), array('..', '.'));
         array_walk($extensions, function (&$item) {
             $item = 'typo3conf/ext/' . $item;
@@ -142,20 +145,18 @@ class Bootstrap
     /**
      * @return Bootstrap
      */
-    private function defineSitePath()
+    private function registerShutdownTestDatabase()
     {
-        define('PATH_site', $this->getWebRoot());
-        define('ORIGINAL_ROOT', PATH_site);
 
-        return $this;
+        register_shutdown_function(array($this, 'tearDownTestDatabase'));
     }
 
     /**
-     * @return string
+     * @return Bootstrap
      */
-    private function getWebRoot()
+    private function registerShutdownTestInstance()
     {
-        $webRoot = realpath(dirname(__FILE__) . '/../../../../../');
-        return strtr($webRoot, '\\', '/') . DIRECTORY_SEPARATOR;
+
+        register_shutdown_function(array($this, 'tearDownTestInstance'));
     }
 }
