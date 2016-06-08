@@ -147,19 +147,11 @@ abstract class BaseControllerTest
      */
     protected function processRequestWith($controller, $action, array $arguments = array(), $method = 'GET')
     {
-        if (null !== $this->configuration->getVendorName()) {
-            $arguments = array_merge(
-                $arguments,
-                array(
-                    '@vendor' => $this->configuration->getVendorName()
-                )
-            );
-        }
-
         $requestArguments = $this->convertArgumentsToRequestArguments($arguments);
 
         $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
         $request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
+        $request->setControllerVendorName($this->configuration->getVendorName());
         $request->setControllerActionName($action);
         $request->setControllerExtensionName($this->configuration->getExtensionName());
         $request->setControllerName($controller);
