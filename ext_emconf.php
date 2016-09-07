@@ -19,14 +19,5 @@ $EM_CONF[$_EXTKEY] = array(
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => '',
-    'version' => '1.0.dev',
-    'constraints' => array(
-        'depends' => array(
-            'cms' => '',
-            'typo3' => '6.2.0-0.0.0',
-            'php' => '5.3.0-0.0.0',
-        ),
-        'conflicts' => array(),
-        'suggests' => array(),
-    ),
+    'version' => '1.0.dev'
 );
