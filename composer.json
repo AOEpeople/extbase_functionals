@@ -20,6 +20,11 @@
         "typo3/cms-core": "*",
         "typo3/cms-extbase": "*"
     },
+    "autoload": {
+        "psr-4": {
+            "Aoe\\ExtbaseFunctionals\\": "Classes/"
+        }
+    },
     "replace": {
         "extbase_functionals": "*"
     },
