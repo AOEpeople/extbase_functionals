@@ -19,5 +19,5 @@ $EM_CONF[$_EXTKEY] = array(
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => '',
-    'version' => '1.0.dev'
+    'version' => '0.3.1'
 );
