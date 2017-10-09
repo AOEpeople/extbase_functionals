@@ -24,6 +24,7 @@
  ***************************************************************/
 namespace Aoe\ExtbaseFunctionals\Bootstrap;
 
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use TYPO3\CMS\Core\Tests\FunctionalTestCaseBootstrapUtility;
 
 /**
@@ -34,7 +35,7 @@ use TYPO3\CMS\Core\Tests\FunctionalTestCaseBootstrapUtility;
  * @package ExtbaseFunctionals
  * @subpackage Bootstrap
  */
-class Bootstrap
+class Bootstrap extends FunctionalTestCase
 {
     /**
      * @var FunctionalTestCaseBootstrapUtility
@@ -51,6 +52,8 @@ class Bootstrap
      */
     public function __construct()
     {
+        parent::__construct();
+
         self::$functionalTestCaseBootstrapUtility = new FunctionalTestCaseBootstrapUtility();
         self::$functionalTestCaseBootstrapUtilityReflection = new \ReflectionClass(
             self::$functionalTestCaseBootstrapUtility
