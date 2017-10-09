@@ -27,7 +27,13 @@ namespace Aoe\ExtbaseFunctionals;
 
 use Aoe\ExtbaseFunctionals\Bootstrap\Bootstrap;
 
-require_once dirname(__FILE__) . '/../../../../typo3/sysext/core/Build/FunctionalTestsBootstrap.php';
+$typo3V7_bootstrap = __DIR__ . '/../../../../Packages/Libraries/typo3/cms/typo3/sysext/core/Build/FunctionalTestsBootstrap.php';
+if (file_exists($typo3V7_bootstrap)) {
+    require_once $typo3V7_bootstrap;
+} else {
+    require_once __DIR__ . '/../../../../typo3/sysext/core/Build/FunctionalTestsBootstrap.php';
+}
+
 require_once dirname(__FILE__) . '/Bootstrap/Bootstrap.php';
 
 $bootstrap = new Bootstrap();
