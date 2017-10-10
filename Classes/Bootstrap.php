@@ -36,5 +36,5 @@ if (file_exists($typo3V7_bootstrap)) {
 
 require_once dirname(__FILE__) . '/Bootstrap/Bootstrap.php';
 
-$bootstrap = new Bootstrap();
-$bootstrap->setUp();
+//$bootstrap = new Bootstrap();
+//$bootstrap->setUp();
