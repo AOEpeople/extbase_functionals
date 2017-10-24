@@ -7,8 +7,6 @@ $EM_CONF[$_EXTKEY] = array(
     'author' => 'AOE GmbH',
     'author_email' => 'dev@aoe.com',
     'shy' => '',
-    'dependencies' => 'extbase',
-    'conflicts' => '',
     'priority' => '',
     'module' => '',
     'state' => 'alpha',
@@ -19,5 +17,16 @@ $EM_CONF[$_EXTKEY] = array(
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => '',
-    'version' => '0.3.1'
+    'version' => '0.3.1',
+    'constraints' =>
+        array(
+            'depends' =>
+                array(
+                    'extbase' => '',
+                ),
+            'conflicts' =>
+                array(),
+            'suggests' =>
+                array(),
+        ),
 );
